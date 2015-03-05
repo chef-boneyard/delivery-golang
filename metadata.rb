@@ -6,5 +6,5 @@ description      'Installs/Configures Golang Applications'
 long_description 'Delivery build cookbook for Golang Applications'
 version          '0.1.0'
 
-depends 'golang'
 depends 'delivery-truck'
+

@@ -1,6 +1,12 @@
 #
-# Copyright:: Copyright (c) 2012-2015 Chef Software, Inc.
+# Cookbook Name:: delivery-golang
+# Library:: delivery_golang_unit
 #
+# Author:: Salim Afiune (<afiune@chef.io>)
+#
+# Copyright 2015, Chef Software, Inc.
+#
+# All rights reserved - Do Not Redistribute
 
 class Chef
   class Provider
@@ -14,15 +20,16 @@ class Chef
       private
 
       def run_tests
-        Chef::Log.info("-------------------")
-        Chef::Log.info(golang_exec(test_command(@new_resource.package_name)))
-        Chef::Log.info("Coverage Summary")
-        Chef::Log.info("-------------------")
-        if File.exists?(coverage_full_path)
-          Chef::Log.info(golang_exec(coverage_command(@new_resource.package_name)))
-          File.delete(coverage_full_path)
+        output = "\nGolang Test for Package [#{new_resource.package_name}] "
+        output << "\n-------------------\n"
+        output << golang_exec(test_command(@new_resource.package_name))
+        if ::File.exists?(coverage_full_path)
+          output << "\n\nCoverage Summary"
+          output << "\n-------------------\n"
+          output << golang_exec(coverage_command(@new_resource.package_name))
+          ::File.delete(coverage_full_path)
         end
-        true
+        Chef::Log.info(output)
       end
 
       def test_command(pkg)
@@ -39,7 +46,7 @@ class Chef
       end
 
       def coverage_full_path
-        "#{repo_path}/cover_#{@new_resource.package_name}}.out"
+        "#{repo_path}/cover_#{@new_resource.package_name}.out"
       end
     end
   end

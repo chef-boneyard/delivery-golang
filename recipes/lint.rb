@@ -2,15 +2,18 @@
 # Cookbook Name:: delivery-golang
 # Recipe:: lint
 #
-# Copyright (c) 2015 The Authors, All Rights Reserved.
+# Author:: Salim Afiune (<afiune@chef.io>)
+#
+# Copyright 2015, Chef Software, Inc.
+#
+# All rights reserved - Do Not Redistribute
 
 # Golang Lint Test
-delivery_truck_exec "push_to_github" do
-  command "go vet ./..."
+execute "Golang Lint Test for #{project_name}" do
+  command "golint ./..."
   cwd repo_path
-  environment ({
-    "GIT_SSH" => git_ssh
-    })
+  user 'dbuild'
+  environment golang_environment
 end
 
 # Lint Test for any cookbook we might have under cookbooks/

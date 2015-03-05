@@ -2,18 +2,18 @@
 # Cookbook Name:: delivery-golang
 # Recipe:: syntax
 #
-# Copyright (c) 2015 The Authors, All Rights Reserved.
+# Author:: Salim Afiune (<afiune@chef.io>)
+#
+# Copyright 2015, Chef Software, Inc.
+#
+# All rights reserved - Do Not Redistribute
 
 # Golang Syntax Test
-delivery_truck_exec "Golang Syntax Test for #{project_name}" do
+execute "Golang Syntax Test for #{project_name}" do
   command "go vet ./..."
   cwd repo_path
-  user node['go']['owner']
-  group node['go']['group']
-  environment({
-    'GOPATH' => node['go']['gopath'],
-    'GOBIN' => node['go']['gobin']
-  })
+  user 'dbuild'
+  environment golang_environment
 end
 
 # Syntax Test for any cookbook we might have under cookbooks/

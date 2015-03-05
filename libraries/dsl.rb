@@ -1,6 +1,12 @@
 #
-# Copyright:: Copyright (c) 2012-2015 Chef Software, Inc.
+# Cookbook Name:: delivery-golang
+# Library:: dsl
 #
+# Author:: Salim Afiune (<afiune@chef.io>)
+#
+# Copyright 2015, Chef Software, Inc.
+#
+# All rights reserved - Do Not Redistribute
 
 require_relative 'helpers'
 

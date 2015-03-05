@@ -1,12 +1,19 @@
 #
-# Copyright:: Copyright (c) 2012-2015 Chef Software, Inc.
+# Cookbook Name:: delivery-golang
+# Library:: helpers
 #
+# Author:: Salim Afiune (<afiune@chef.io>)
+#
+# Copyright 2015, Chef Software, Inc.
+#
+# All rights reserved - Do Not Redistribute
 
 require 'chef/mixin/shell_out'
 
 module DeliveryGolang
   module Helpers
     include Chef::Mixin::ShellOut
+    include DeliveryTruck::Helpers
     extend self
 
     # The Golang Partial Path specified in the `.delivery/config.json`
@@ -16,7 +23,18 @@ module DeliveryGolang
     def delivery_golang_path(node)
       node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['golang']['path']
     rescue
-      project_name
+      project_name(node)
+    end
+
+    # Golang Package Dependencies specified in the `.delivery/config.json`
+    #
+    # @param [Chef::Node] Chef Node object
+    # @return [Array]
+    def delivery_golang_packages(node)
+      node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['golang']['packages'] +
+      [delivery_golang_path(node)]
+    rescue
+      [delivery_golang_path(node)]
     end
 
     # Golang Project Full Path
@@ -24,7 +42,7 @@ module DeliveryGolang
     # @param [Chef::Node] Chef Node object
     # @return [String]
     def golang_project_path(node)
-      "#{node['go']['gopath']}/src/#{delivery_golang_path(node)}"
+      "#{node['delivery-golang']['go']['gopath']}/src/#{delivery_golang_path(node)}"
     end
 
     # Golang Project Directory Name
@@ -41,17 +59,41 @@ module DeliveryGolang
     # @return [Hash]
     def golang_environment(node)
       {
-        'GOPATH' => node['go']['gopath'],
-        'GOBIN' => node['go']['gobin']
+        'GOPATH' => node['delivery-golang']['go']['gopath'],
+        'GOBIN' => node['delivery-golang']['go']['gobin'],
+        'GIT_SSH' => git_ssh(node),
+        'PATH' => "#{ENV['PATH']}:#{node['delivery-golang']['go']['gobin']}:#{node['delivery-golang']['go']['install_dir']}/go/bin"
       }
+    end
+
+    # Pull down the encrypted data bag containing the secrets for this project.
+    #
+    # @param [Chef::Node] Chef Node object
+    # @return [Hash]
+    def get_secrets(node)
+      secret_file = Chef::EncryptedDataBagItem.load_secret(Chef::Config[:encrypted_data_bag_secret])
+      secrets = Chef::EncryptedDataBagItem.load('delivery-secrets', project_slug(node), secret_file)
+      secrets
+    end
+
+    def build_user_home(node)
+      "/home/#{node['delivery_builder']['build_user']}"
+    end
+
+    def deploy_key_path(node)
+      "#{build_user_home(node)}/.ssh/#{project_slug(node)}-github.pem"
+    end
+
+    def git_ssh(node)
+      ::File.join(node['delivery_builder']['cache'], 'git_ssh')
     end
 
     # Golang Project Test Packages
     #
     # @return [Array]
-    def golang_test_project_packages
+    def golang_test_project_packages(node)
       @@test_packages ||= begin
-        go_test = Dir.glob("#{repo_path}/**/*_test.go")
+        go_test = Dir.glob("#{repo_path(node)}/**/*_test.go")
         go_test.map! do |test|
           File.basename(File.dirname(test))
         end
@@ -62,9 +104,9 @@ module DeliveryGolang
     #
     # @return [Array]
     def golang_exec(command, node)
-      shell_out(
+      shell_out!(
           command,
-          :cwd => repo_path,
+          :cwd => repo_path(node),
           :environment => golang_environment(node)
         ).stdout.strip
     end
@@ -95,5 +137,37 @@ module DeliveryGolang
     def golang_exec(command)
       DeliveryGolang::Helpers.golang_exec(command, node)
     end
+
+    # Get the Golang Project Test Packages
+    def golang_test_project_packages
+      DeliveryGolang::Helpers.golang_test_project_packages(node)
+    end
+
+    # Get Golang Package Dependencies
+    def delivery_golang_packages
+      DeliveryGolang::Helpers.delivery_golang_packages(node)
+    end
+
+    # Get Golang Package Dependencies
+    def configure_github
+      DeliveryGolang::Helpers.configure_github(node)
+    end
+
+    def get_secrets
+      DeliveryGolang::Helpers.get_secrets(node)
+    end
+
+    def build_user_home
+      DeliveryGolang::Helpers.build_user_home(node)
+    end
+
+    def deploy_key_path
+      DeliveryGolang::Helpers.deploy_key_path(node)
+    end
+
+    def git_ssh
+      DeliveryGolang::Helpers.git_ssh(node)
+    end
+
   end
 end
