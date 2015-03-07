@@ -14,7 +14,7 @@ bash "install-golang" do
   code <<-EOH
     rm -rf go
     rm -rf #{node['delivery-golang']['go']['install_dir']}/go
-    tar -C #{node['delivery-golang']['go']['install_dir']} -xzf #{node["go"]["filename"]}
+    tar -C #{node['delivery-golang']['go']['install_dir']} -xzf #{node['delivery-golang']['go']['filename']}
   EOH
   action :nothing
 end
