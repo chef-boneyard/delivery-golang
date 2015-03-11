@@ -16,6 +16,39 @@ module DeliveryGolang
     include DeliveryTruck::Helpers
     extend self
 
+    # The list of cookbook under cookbooks/
+    #
+    # @param [Chef::Node] Chef Node object
+    # @return [String]
+    def get_cookbooks(node)
+      cookbooks = []
+
+      if File.directory?(File.join(repo_path(node), 'cookbooks'))
+        Dir.chdir(repo_path(node)) do
+          Dir.glob('cookbooks/*').select do |entry|
+            full_path = File.join(repo_path(node), entry)
+
+            # Make sure the entry is a directory and a cookbook
+            if File.directory?(full_path) && is_cookbook?(full_path)
+              cookbooks << get_cookbook_name(full_path)
+            end
+          end
+        end
+      end
+
+      cookbooks
+    end
+
+    # The Deployment Percentage specified in the `.delivery/config.json`
+    #
+    # @param [Chef::Node] Chef Node object
+    # @return [String]
+    def delivery_golang_deploy_percentage(node)
+      node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['deploy']['percentage']
+    rescue
+      100
+    end
+
     # The Golang Partial Path specified in the `.delivery/config.json`
     #
     # @param [Chef::Node] Chef Node object
@@ -117,6 +150,11 @@ module DeliveryGolang
       DeliveryGolang::Helpers.delivery_golang_path(node)
     end
 
+    # Get the Golang Partial Path
+    def delivery_golang_deploy_percentage
+      DeliveryGolang::Helpers.delivery_golang_deploy_percentage (node)
+    end
+
     # Get the Golang Project Full Path
     def golang_project_path
       DeliveryGolang::Helpers.golang_project_path(node)
@@ -168,5 +206,8 @@ module DeliveryGolang
       DeliveryGolang::Helpers.git_ssh(node)
     end
 
+    def get_cookbooks
+      DeliveryGolang::Helpers.get_cookbooks(node)
+    end
   end
 end
