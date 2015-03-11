@@ -31,10 +31,9 @@ module DeliveryGolang
     # @param [Chef::Node] Chef Node object
     # @return [Array]
     def delivery_golang_packages(node)
-      node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['golang']['packages'] +
-      [delivery_golang_path(node)]
+      node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['golang']['packages']
     rescue
-      [delivery_golang_path(node)]
+      []
     end
 
     # Golang Project Full Path

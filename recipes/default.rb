@@ -66,9 +66,14 @@ end
 
 # Get all Golang Package Dependencies
 delivery_golang_packages.each do |pkg|
-  golang_package pkg
+  golang_package pkg do
+    action :install
+  end
 end
 
+golang_package delivery_golang_path
+
+#
 # Temporary workaround until we reliably use a newer version of ChefDK
 chef_gem 'chefspec' do
   version '4.2.0'

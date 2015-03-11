@@ -19,16 +19,6 @@ golang_package delivery_golang_path do
   action :build
 end
 
-# execute "git_commit_new_build_#{project_name}" do
-#   cwd repo_path
-#   command <<-EOF.gsub(/\s+/, " ").strip!
-#     git add .;
-#     git commit -m "New Binary Build - #{project_name}"
-#   EOF
-#   not_if "test `git status --porcelain | wc -l` == 0"
-#   action :run
-# end
-
 # Publish any cookbook we might have under cookbooks/ and
 # push this project to github (if we specify it)
 include_recipe "delivery-truck::publish"

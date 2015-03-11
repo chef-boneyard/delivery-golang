@@ -55,7 +55,8 @@ export GOBIN=#{node['delivery-golang']['go']['gobin']}
 end
 
 if node['delivery-golang']['go']['scm']
-  %w(git mercurial).each do |scm|
+  # Do we really need mercurial?
+  %w(git).each do |scm|
     package scm
   end
 end
