@@ -8,28 +8,53 @@
 #
 # All rights reserved - Do Not Redistribute
 
-# Doing rolling deployments
+load_config File.join(repo_path, '.delivery', 'config.json')
+
+# Rolling Deployments
 #
 # As part of this project needs, we must trigger a CCR always
 # So we do the right deployment at the right time and order.
-load_config File.join(repo_path, '.delivery', 'config.json')
+#
+# TODO: Order them as they are shown in `.delivery/config.json`
+# => "deploy": {
+#       "rolling": {
+#         "deploy-greentea": 20,
+#         "lb-greentea": 100,
+#         "audit": false,
+#       }
+#     }
+deploy_criteria = get_cookbooks.map do |cookbook|
+  {
+    "search" => "recipes:#{cookbook}*",
+    "incremental" => delivery_golang_deploy_rolling(cookbook),
+    "percentage" => delivery_golang_deploy_rolling(cookbook)
+  }
+end
 
-search_criteria = get_cookbooks.map {|cookbook| "recipes:#{cookbook}*" }
-
-percentage = 0
+# Only deploy the cookbooks you have modified? Uhmmm..
+# deploy_criteria = changed_cookbooks.map { |cookbook| "recipes:#{cookbook[:name]}*" }
 
 # Deploy incrementally
 begin
-  # Increment the percentage
-  percentage += delivery_golang_deploy_percentage
+  completed = true
 
-  # Ensure we are not going further 100 percent
-  percentage = 100 if percentage > 100
+  deploy_criteria.each do |criteria|
+    if criteria['incremental']
+      delivery_golang_deploy "deploy_#{project_name}_cookbook_#{criteria['search']}_#{criteria['percentage']}%" do
+        search criteria['search']
+        percentage criteria['percentage']
+      end
 
-  search_criteria.each do |cookbook|
-    delivery_golang_deploy "deploy_#{project_name}_cookbook_#{cookbook}_#{percentage}" do
-      search cookbook
-      percentage percentage
+      # Increment the percentage
+      criteria['percentage'] += criteria['incremental'] if criteria['percentage'] < 100
+
+      # Ensure we are not going further 100 percent
+      criteria['percentage'] = 100 if criteria['percentage'] > 100
+
+      # We have not completed
+      completed = false if criteria['percentage'] != 100
     end
   end
-end while percentage < 100
+
+  # Deploy until we have completed
+end until completed

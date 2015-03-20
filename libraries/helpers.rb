@@ -39,12 +39,14 @@ module DeliveryGolang
       cookbooks
     end
 
-    # The Deployment Percentage specified in the `.delivery/config.json`
+    # The Deployment Percentage per Rolling Cookbook specified
+    # in the `.delivery/config.json`
     #
     # @param [Chef::Node] Chef Node object
+    # @param [String] Cookbook name
     # @return [String]
-    def delivery_golang_deploy_percentage(node)
-      node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['deploy']['percentage']
+    def delivery_golang_deploy_rolling(node, cookbook)
+      node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['deploy']['rolling'][cookbook]
     rescue
       100
     end
@@ -150,9 +152,9 @@ module DeliveryGolang
       DeliveryGolang::Helpers.delivery_golang_path(node)
     end
 
-    # Get the Golang Partial Path
-    def delivery_golang_deploy_percentage
-      DeliveryGolang::Helpers.delivery_golang_deploy_percentage (node)
+    # Get the deploy percentage per rolling cookbook
+    def delivery_golang_deploy_rolling(cookbook)
+      DeliveryGolang::Helpers.delivery_golang_deploy_rolling(node, cookbook)
     end
 
     # Get the Golang Project Full Path
