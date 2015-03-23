@@ -8,6 +8,8 @@
 #
 # All rights reserved - Do Not Redistribute
 
+load_config File.join(repo_path, '.delivery', 'config.json')
+
 # Golang Syntax Test
 execute "Golang Syntax Test for #{project_name}" do
   command "go vet ./..."
@@ -17,4 +19,9 @@ execute "Golang Syntax Test for #{project_name}" do
 end
 
 # Syntax Test for any cookbook we might have under cookbooks/
-include_recipe "delivery-truck::syntax"
+changed_cookbooks.each do |cookbook|
+  # Run `knife cookbook test` against the modified cookbook
+  execute "syntax_check_#{cookbook[:name]}" do
+    command "knife cookbook test -c #{delivery_chef_config} -o #{cookbook[:path]} -a"
+  end
+end

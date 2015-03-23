@@ -8,6 +8,8 @@
 #
 # All rights reserved - Do Not Redistribute
 
+load_config File.join(repo_path, '.delivery', 'config.json')
+
 # Golang Lint Test
 execute "Golang Lint Test for #{project_name}" do
   command "golint ./..."
@@ -17,4 +19,9 @@ execute "Golang Lint Test for #{project_name}" do
 end
 
 # Lint Test for any cookbook we might have under cookbooks/
-include_recipe "delivery-truck::lint"
+changed_cookbooks.each do |cookbook|
+  # Run Foodcritic against any cookbooks that were modified.
+  execute "lint_foodcritic_#{cookbook[:name]}" do
+    command "foodcritic -f correctness #{foodcritic_tags} #{cookbook[:path]}"
+  end
+end

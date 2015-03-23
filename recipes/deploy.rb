@@ -20,7 +20,7 @@ load_config File.join(repo_path, '.delivery', 'config.json')
 #       "rolling": {
 #         "deploy-greentea": 20,
 #         "lb-greentea": 100,
-#         "audit": false,
+#         "audit": false
 #       }
 #     }
 deploy_criteria = get_cookbooks.map do |cookbook|

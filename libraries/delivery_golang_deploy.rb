@@ -68,19 +68,20 @@ class Chef
 
         ::Chef::Log.info("Will wait up to #{timeout/60} minutes for " +
                          "deployment to complete...")
+
+        ::Chef_Delivery::ClientHelper.load_delivery_user
+
         begin
           # Sleep unless this is our first time through the loop.
           sleep(SLEEP_TIME) unless timeout == origin
 
           # Find any dependency/app node
           ::Chef::Log.info("Finding dependency/app nodes in #{delivery_environment}...")
-          ::Chef_Delivery::ClientHelper.enter_client_mode_as_delivery
           nodes = search(:node, get_search)
 
           if !nodes || nodes.empty?
             # We didn't find any node to deploy. Lets skip this phase!
             ::Chef::Log.info("No dependency/app nodes found. Skipping phase!")
-            ::Chef_Delivery::ClientHelper.enter_solo_mode
             break
           end
 
@@ -98,14 +99,12 @@ class Chef
 
           if !node_names || node_names.empty?
             ::Chef::Log.info("Empty percentage of nodes found.")
-            ::Chef_Delivery::ClientHelper.enter_solo_mode
             break
           end
 
           ::Chef::Log.info("Percentage nodes to deploy: #{node_names}")
 
           chef_server_rest = Chef::REST.new(Chef::Config[:chef_server_url])
-          ::Chef_Delivery::ClientHelper.enter_solo_mode
 
           # Kick off command via push.
           ::Chef::Log.info("Triggering #{new_resource.command} on dependency nodes " +
@@ -190,6 +189,8 @@ class Chef
 
           dec_timeout(SLEEP_TIME)
         end while timeout > 0
+
+        ::Chef_Delivery::ClientHelper.return_to_zero
 
         ## If we make it here and we are past our timeout the job timed out.
         if timeout <= 0

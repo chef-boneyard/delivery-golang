@@ -20,6 +20,12 @@ This is an example of the `.delivery/config.json` you should use to build a Gola
     "publish": {
         "chef_server": true,
         "github": "chef/greentea"
+    },
+    "deploy": {
+      "rolling": {
+        "deploy-greentea": 20,
+        "lb-greentea": 100,
+        "audit": false
     }
   }
 }

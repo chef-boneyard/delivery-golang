@@ -46,8 +46,8 @@ class Chef
           opts = {}
           opts[:timeout] = 3600
           opts[:environment] = golang_environment
-          opts[:user] = node['delivery-golang']['go']['user']
-          opts[:group] = node['delivery-golang']['go']['group']
+          # opts[:user] = node['delivery-golang']['go']['user']
+          # opts[:group] = node['delivery-golang']['go']['group']
           opts[:cwd] = @new_resource.cwd if @new_resource.cwd
           opts[:log_level] = :info
           opts[:live_stream] = Chef::Log.logger

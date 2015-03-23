@@ -8,6 +8,8 @@
 #
 # All rights reserved - Do Not Redistribute
 
+load_config File.join(repo_path, '.delivery', 'config.json')
+
 Chef::Log.info("No Golang Tests found for #{project_name}") if golang_test_project_packages.empty?
 
 # Golang Tests
@@ -17,16 +19,12 @@ golang_test_project_packages.each do |go_package|
   end
 end
 
-load_config File.join(repo_path, '.delivery', 'config.json')
-
+# Unit Test for any cookbook we might have under cookbooks/
 changed_cookbooks.each do |cookbook|
   # Run RSpec against the modified cookbook
-  delivery_truck_exec "unit_rspec_#{cookbook[:name]}" do
+  execute "unit_rspec_#{cookbook[:name]}" do
     cwd cookbook[:path]
     command "berks install; rspec --format documentation --color"
     only_if { has_spec_tests?(cookbook[:path]) }
   end
 end
-
-# Unit Test for any cookbook we might have under cookbooks/
-# include_recipe "delivery-truck::unit"

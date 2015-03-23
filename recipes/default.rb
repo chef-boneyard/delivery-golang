@@ -9,7 +9,6 @@
 # All rights reserved - Do Not Redistribute
 
 include_recipe "delivery-golang::_golang"
-include_recipe "delivery-truck"
 
 # Nuke old golang project link
 link golang_project_path do
@@ -38,7 +37,7 @@ if push_repo_to_github?
   end
 
   file deploy_key_path do
-    content get_secrets['github']
+    content get_project_secrets['github']
     owner node['delivery_builder']['build_user']
     group 'root'
     mode '0600'
