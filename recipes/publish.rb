@@ -81,17 +81,13 @@ end
 
 # If the user specified a github repo to push to, push to that repo
 if push_repo_to_github?
-  build_user_home = "/home/#{node['delivery_builder']['build_user']}"
-  deploy_key_path = "#{build_user_home}/.ssh/#{project_slug}-github.pem"
-  git_ssh = ::File.join(node['delivery_builder']['cache'], 'git_ssh')
-
   directory "#{build_user_home}/.ssh" do
     owner node['delivery_builder']['build_user']
     group 'root'
     mode '0700'
   end
 
-  file deploy_key_path do
+  file "#{build_user_home}/.ssh/#{project_slug}-github.pem" do
     content get_project_secrets['github']
     owner node['delivery_builder']['build_user']
     group 'root'

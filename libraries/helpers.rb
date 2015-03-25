@@ -260,7 +260,7 @@ module DeliveryGolang
     # @param [String] Cookbook name
     # @return [String]
     def delivery_golang_deploy_rolling(node, cookbook)
-      node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['deploy']['rolling'][cookbook]
+      node['delivery']['config']['build_attributes']['deploy']['rolling'][cookbook]
     rescue
       100
     end
@@ -270,7 +270,7 @@ module DeliveryGolang
     # @param [Chef::Node] Chef Node object
     # @return [String]
     def delivery_golang_path(node)
-      node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['golang']['path']
+      node['delivery']['config']['build_attributes']['golang']['path']
     rescue
       project_name(node)
     end
@@ -280,7 +280,7 @@ module DeliveryGolang
     # @param [Chef::Node] Chef Node object
     # @return [Array]
     def delivery_golang_packages(node)
-      node[CONFIG_ATTRIBUTE_KEY]['build_attributes']['golang']['packages']
+      node['delivery']['config']['build_attributes']['golang']['packages']
     rescue
       []
     end
@@ -329,7 +329,7 @@ module DeliveryGolang
     end
 
     def build_user_home(node)
-      "/home/#{node['delivery_builder']['build_user']}"
+      "/var/opt/delivery/workspace"
     end
 
     # Return the project name
