@@ -29,39 +29,40 @@ link golang_project_path do
   to repo_path
 end
 
-if push_repo_to_github?
-  directory "#{build_user_home}/.ssh" do
-    owner node['delivery_builder']['build_user']
-    group 'root'
-    mode '0700'
-  end
+# Commenting this to lay down the private key since we must have it
+# if push_repo_to_github?
+directory "#{build_user_home}/.ssh" do
+  owner node['delivery_builder']['build_user']
+  group 'root'
+  mode '0700'
+end
 
-  file deploy_key_path do
-    content get_project_secrets['github']
-    owner node['delivery_builder']['build_user']
-    group 'root'
-    mode '0600'
-  end
+file deploy_key_path do
+  content get_project_secrets['github']
+  owner node['delivery_builder']['build_user']
+  group 'root'
+  mode '0600'
+end
 
-  file git_ssh do
-    content <<-EOH
+file git_ssh do
+  content <<-EOH
 #!/bin/bash
 # Martin Emde
 # https://github.com/martinemde/git-ssh-wrapper
 
 unset SSH_AUTH_SOCK
 ssh -o CheckHostIP=no \
-    -o IdentitiesOnly=yes \
-    -o LogLevel=INFO \
-    -o StrictHostKeyChecking=no \
-    -o PasswordAuthentication=no \
-    -o UserKnownHostsFile=/tmp/delivery-git-known-hosts \
-    -o IdentityFile=#{deploy_key_path} \
-    $*
-    EOH
-    mode '0755'
-  end
+  -o IdentitiesOnly=yes \
+  -o LogLevel=INFO \
+  -o StrictHostKeyChecking=no \
+  -o PasswordAuthentication=no \
+  -o UserKnownHostsFile=/tmp/delivery-git-known-hosts \
+  -o IdentityFile=#{deploy_key_path} \
+  $*
+  EOH
+  mode '0755'
 end
+# end
 
 # Get all Golang Package Dependencies
 delivery_golang_packages.each do |pkg|
