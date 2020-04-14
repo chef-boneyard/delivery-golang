@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: delivery-golang
+# Cookbook:: delivery-golang
 # Recipe:: lint
 #
 # Author:: Salim Afiune (<afiune@chef.io>)
 #
-# Copyright 2015, Chef Software, Inc.
+# Copyright:: 2015, Chef Software, Inc.
 #
 # All rights reserved - Do Not Redistribute
 
@@ -12,7 +12,7 @@ load_config File.join(repo_path, '.delivery', 'config.json')
 
 # Golang Lint Test
 execute "Golang Lint Test for #{project_name}" do
-  command "golint ./..."
+  command 'golint ./...'
   cwd repo_path
   user 'dbuild'
   environment golang_environment

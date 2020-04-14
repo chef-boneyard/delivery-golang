@@ -1,14 +1,14 @@
 #
-# Cookbook Name:: delivery-golang
+# Cookbook:: delivery-golang
 # Recipe:: default
 #
 # Author:: Salim Afiune (<afiune@chef.io>)
 #
-# Copyright 2015, Chef Software, Inc.
+# Copyright:: 2015, Chef Software, Inc.
 #
 # All rights reserved - Do Not Redistribute
 
-include_recipe "delivery-golang::_golang"
+include_recipe 'delivery-golang::_golang'
 
 # Nuke old golang project link
 link golang_project_path do

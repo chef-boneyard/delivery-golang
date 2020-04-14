@@ -18,7 +18,6 @@ module DeliveryGolang
   end
 
   module DSL
-
     # Does cookbook have spec tests?
     def has_spec_tests?(cookbook_path)
       DeliveryGolang::Helpers::Unit.has_spec_tests?(cookbook_path)

@@ -18,7 +18,6 @@ module DeliveryGolang
   end
 
   module DSL
-
     # Can we find Test Kitchen files?
     def has_kitchen_tests?(cookbook_path)
       DeliveryGolang::Helpers::Functional.has_kitchen_tests?(cookbook_path)

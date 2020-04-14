@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: delivery-golang
+# Cookbook:: delivery-golang
 # Recipe:: publish
 #
 # Author:: Salim Afiune (<afiune@chef.io>)
 #
-# Copyright 2015, Chef Software, Inc.
+# Copyright:: 2015, Chef Software, Inc.
 #
 # All rights reserved - Do Not Redistribute
 
@@ -26,12 +26,12 @@ end
 ruby_block 'Upload Binary to S3 Bucket' do
   block do
     s3 = AWS::S3.new(
-      :access_key_id => get_project_secrets['access_key_id'],
-      :secret_access_key => get_project_secrets['secret_access_key']
-     )
-    s3.buckets[publish_s3_bucket].
-      objects[project_name].
-      write(Pathname.new("#{binary_path}/#{project_name}"))
+      access_key_id: get_project_secrets['access_key_id'],
+      secret_access_key: get_project_secrets['secret_access_key']
+    )
+    s3.buckets[publish_s3_bucket]
+      .objects[project_name]
+      .write(Pathname.new("#{binary_path}/#{project_name}"))
   end
 end
 
@@ -41,7 +41,7 @@ end
 # push this project to github (if we specify it)
 
 # Create the upload directory where cookbooks to be uploaded will be staged
-cookbook_directory = File.join(node['delivery_builder']['cache'], "cookbook-upload")
+cookbook_directory = File.join(node['delivery_builder']['cache'], 'cookbook-upload')
 directory cookbook_directory
 
 # Create the environment if it doesn't exist
@@ -53,7 +53,7 @@ ruby_block "Create Env #{env_name} if not there." do
     begin
       env = Chef::Environment.load(env_name)
     rescue Net::HTTPServerException => http_e
-      raise http_e unless http_e.response.code == "404"
+      raise http_e unless http_e.response.code == '404'
       Chef::Log.info("Creating Environment #{env_name}")
       env = Chef::Environment.new()
       env.name(env_name)
@@ -113,16 +113,16 @@ ssh -o CheckHostIP=no \
     mode '0755'
   end
 
-  execute "add_github_remote" do
+  execute 'add_github_remote' do
     command "git remote add github git@github.com:#{github_repo}.git"
     cwd node['delivery_builder']['repo']
-    environment({"GIT_SSH" => git_ssh})
-    not_if "git remote --verbose | grep ^github"
+    environment({ 'GIT_SSH' => git_ssh })
+    not_if 'git remote --verbose | grep ^github'
   end
 
-  execute "push_to_github" do
-    command "git push github master"
+  execute 'push_to_github' do
+    command 'git push github master'
     cwd node['delivery_builder']['repo']
-    environment({"GIT_SSH" => git_ssh})
+    environment({ 'GIT_SSH' => git_ssh })
   end
 end
