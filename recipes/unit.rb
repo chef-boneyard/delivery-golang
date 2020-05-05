@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: delivery-golang
+# Cookbook:: delivery-golang
 # Recipe:: unit
 #
 # Author:: Salim Afiune (<afiune@chef.io>)
 #
-# Copyright 2015, Chef Software, Inc.
+# Copyright:: 2015, Chef Software, Inc.
 #
 # All rights reserved - Do Not Redistribute
 
@@ -24,7 +24,7 @@ changed_cookbooks.each do |cookbook|
   # Run RSpec against the modified cookbook
   execute "unit_rspec_#{cookbook[:name]}" do
     cwd cookbook[:path]
-    command "berks install; rspec --format documentation --color"
+    command 'berks install; rspec --format documentation --color'
     only_if { has_spec_tests?(cookbook[:path]) }
   end
 end

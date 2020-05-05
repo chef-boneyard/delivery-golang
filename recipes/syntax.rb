@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: delivery-golang
+# Cookbook:: delivery-golang
 # Recipe:: syntax
 #
 # Author:: Salim Afiune (<afiune@chef.io>)
 #
-# Copyright 2015, Chef Software, Inc.
+# Copyright:: 2015, Chef Software, Inc.
 #
 # All rights reserved - Do Not Redistribute
 
@@ -12,7 +12,7 @@ load_config File.join(repo_path, '.delivery', 'config.json')
 
 # Golang Syntax Test
 execute "Golang Syntax Test for #{project_name}" do
-  command "go vet ./..."
+  command 'go vet ./...'
   cwd repo_path
   user 'dbuild'
   environment golang_environment

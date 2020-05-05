@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: delivery-golang
+# Cookbook:: delivery-golang
 # Library:: helpers
 #
 # Author:: Salim Afiune (<afiune@chef.io>)
 #
-# Copyright 2015, Chef Software, Inc.
+# Copyright:: 2015, Chef Software, Inc.
 #
 # All rights reserved - Do Not Redistribute
 
@@ -106,11 +106,11 @@ module DeliveryGolang
       cookbooks_in_repo(node).each do |cookbook|
         if cookbook == repo_dir && !modified_files.empty?
           name = get_cookbook_name(repo_dir)
-          changed_cookbooks << {:name => name, :path => repo_dir}
+          changed_cookbooks << { name: name, path: repo_dir }
         elsif !modified_files.select { |file| file.include? cookbook }.empty?
           path = File.join(repo_dir, cookbook)
           name = get_cookbook_name(path)
-          changed_cookbooks << {:name => name, :path => path}
+          changed_cookbooks << { name: name, path: path }
         end
       end
 
@@ -130,7 +130,6 @@ module DeliveryGolang
     # @param node [Chef::Node] Chef Node object
     # @return [Array#String]
     def cookbooks_in_repo(node)
-
       # Is the current directory a cookbook?
       if is_cookbook?(repo_path(node))
         [repo_path(node)]
@@ -164,7 +163,7 @@ module DeliveryGolang
     def changed_files(parent_sha, change_sha, node)
       response = shell_out!(
         "git diff --name-only #{parent_sha} #{change_sha}",
-        :cwd => repo_path(node)
+        cwd: repo_path(node)
       ).stdout.strip
 
       changed_files = []
@@ -187,14 +186,14 @@ module DeliveryGolang
       if node['delivery']['change']['stage'] == 'verify'
         shell_out(
           "git rev-parse origin/#{branch}",
-          :cwd => repo_path(node)
+          cwd: repo_path(node)
         ).stdout.strip
       else
         # This command looks in the git history for the last two merges to our
         # pipeline branch. The most recent will be our SHA so the second to last
         # will be the SHA we are looking for.
         command = "git log origin/#{branch} --merges --pretty=\"%H\" -n2 | tail -n1"
-        shell_out(command, :cwd => repo_path(node)).stdout.strip
+        shell_out(command, cwd: repo_path(node)).stdout.strip
       end
     end
 
@@ -214,12 +213,12 @@ module DeliveryGolang
     # @return [TrueClass, FalseClass]
     def is_cookbook?(path)
       File.exist?(File.join(path, 'metadata.json')) ||
-      File.exist?(File.join(path, 'metadata.rb'))
+        File.exist?(File.join(path, 'metadata.rb'))
     end
 
     # The list of cookbook under cookbooks/
     #
-    # @param [Chef::Node] Chef Node object
+    #  @param [Chef::Node] Chef Node object
     # @return [String]
     def get_cookbooks(node)
       cookbooks = []
@@ -256,8 +255,8 @@ module DeliveryGolang
     # The Deployment Percentage per Rolling Cookbook specified
     # in the `.delivery/config.json`
     #
-    # @param [Chef::Node] Chef Node object
-    # @param [String] Cookbook name
+    #  @param [Chef::Node] Chef Node object
+    #  @param [String] Cookbook name
     # @return [String]
     def delivery_golang_deploy_rolling(node, cookbook)
       node['delivery']['config']['build_attributes']['deploy']['rolling'][cookbook]
@@ -267,7 +266,7 @@ module DeliveryGolang
 
     # The Golang Partial Path specified in the `.delivery/config.json`
     #
-    # @param [Chef::Node] Chef Node object
+    #  @param [Chef::Node] Chef Node object
     # @return [String]
     def delivery_golang_path(node)
       node['delivery']['config']['build_attributes']['golang']['path']
@@ -277,7 +276,7 @@ module DeliveryGolang
 
     # Golang Package Dependencies specified in the `.delivery/config.json`
     #
-    # @param [Chef::Node] Chef Node object
+    #  @param [Chef::Node] Chef Node object
     # @return [Array]
     def delivery_golang_packages(node)
       node['delivery']['config']['build_attributes']['golang']['packages']
@@ -287,7 +286,7 @@ module DeliveryGolang
 
     # Golang Project Full Path
     #
-    # @param [Chef::Node] Chef Node object
+    #  @param [Chef::Node] Chef Node object
     # @return [String]
     def golang_project_path(node)
       "#{node['delivery-golang']['go']['gopath']}/src/#{delivery_golang_path(node)}"
@@ -295,7 +294,7 @@ module DeliveryGolang
 
     # Golang Project Directory Name
     #
-    # @param [Chef::Node] Chef Node object
+    #  @param [Chef::Node] Chef Node object
     # @return [String]
     def golang_project_dirname(node)
       File.dirname(golang_project_path(node))
@@ -303,14 +302,14 @@ module DeliveryGolang
 
     # Golang Environment Variables
     #
-    # @param [Chef::Node] Chef Node object
+    #  @param [Chef::Node] Chef Node object
     # @return [Hash]
     def golang_environment(node)
       {
         'GOPATH' => node['delivery-golang']['go']['gopath'],
         'GOBIN' => node['delivery-golang']['go']['gobin'],
         'GIT_SSH' => git_ssh(node),
-        'PATH' => "#{ENV['PATH']}:#{node['delivery-golang']['go']['gobin']}:#{node['delivery-golang']['go']['install_dir']}/go/bin"
+        'PATH' => "#{ENV['PATH']}:#{node['delivery-golang']['go']['gobin']}:#{node['delivery-golang']['go']['install_dir']}/go/bin",
       }
     end
 
@@ -328,8 +327,8 @@ module DeliveryGolang
       end
     end
 
-    def build_user_home(node)
-      "/var/opt/delivery/workspace"
+    def build_user_home(_node)
+      '/var/opt/delivery/workspace'
     end
 
     # Return the project name
@@ -381,8 +380,8 @@ EOM
     def golang_exec(command, node)
       shell_out!(
           command,
-          :cwd => repo_path(node),
-          :environment => golang_environment(node)
+          cwd: repo_path(node),
+          environment: golang_environment(node)
         ).stdout.strip
     end
 
@@ -391,11 +390,11 @@ EOM
     # @param [Chef::Node] Chef Node object
     # @return [String]
     def repo_path(node)
-      node['delivery_builder']['repo'] || File.expand_path("../..", __FILE__)
+      node['delivery_builder']['repo'] || File.expand_path('../..', __FILE__)
     end
 
     def delivery_chef_config
-      "/var/opt/delivery/workspace/.chef/knife.rb"
+      '/var/opt/delivery/workspace/.chef/knife.rb'
     end
 
     # Pull down the encrypted data bag containing the secrets for this project.
@@ -406,7 +405,7 @@ EOM
       @@secrets ||= begin
         Chef_Delivery::ClientHelper.load_delivery_user
         secret_file = Chef::EncryptedDataBagItem.load_secret(Chef::Config[:encrypted_data_bag_secret])
-        secrets = Chef::EncryptedDataBagItem.load('delivery-secrets', project_slug(node), secret_file)
+        secrets = data_bag_item('delivery-secrets', project_slug(node), secret_file)
         Chef_Delivery::ClientHelper.return_to_zero
         secrets
       end

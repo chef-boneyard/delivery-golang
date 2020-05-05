@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: delivery-golang
+# Cookbook:: delivery-golang
 # Library:: delivery_golang_unit
 #
 # Author:: Salim Afiune (<afiune@chef.io>)
 #
-# Copyright 2015, Chef Software, Inc.
+# Copyright:: 2015, Chef Software, Inc.
 #
 # All rights reserved - Do Not Redistribute
 
@@ -23,7 +23,7 @@ class Chef
         output = "\nGolang Test for Package [#{new_resource.package_name}] "
         output << "\n-------------------\n"
         output << golang_exec(test_command(@new_resource.package_name))
-        if ::File.exists?(coverage_full_path)
+        if ::File.exist?(coverage_full_path)
           output << "\n\nCoverage Summary"
           output << "\n-------------------\n"
           output << golang_exec(coverage_command(@new_resource.package_name))
@@ -33,7 +33,7 @@ class Chef
       end
 
       def test_command(pkg)
-        <<-CMD.gsub(/^\s+/, "").gsub(/\n/, " ")
+        <<-CMD.gsub(/^\s+/, '').gsub(/\n/, ' ')
           go test -parallel 5
             -coverpkg #{delivery_golang_path}/#{pkg}
             -coverprofile cover_#{pkg}.out
@@ -55,13 +55,12 @@ end
 class Chef
   class Resource
     class DeliveryGolangUnit < Chef::Resource::LWRPBase
-
       actions :run
       default_action :run
 
-      attribute :package_name,  :kind_of => String
+      attribute :package_name, kind_of: String
       self.resource_name = :delivery_golang_unit
-      def initialize(name, run_context=nil)
+      def initialize(name, run_context = nil)
         super
         @provider = Chef::Provider::DeliveryGolangUnit
       end

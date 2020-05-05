@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: delivery-golang
+# Cookbook:: delivery-golang
 # Recipe:: deploy
 #
 # Author:: Salim Afiune (<afiune@chef.io>)
 #
-# Copyright 2015, Chef Software, Inc.
+# Copyright:: 2015, Chef Software, Inc.
 #
 # All rights reserved - Do Not Redistribute
 
@@ -25,9 +25,9 @@ load_config File.join(repo_path, '.delivery', 'config.json')
 #     }
 deploy_criteria = get_cookbooks.map do |cookbook|
   {
-    "search" => "recipes:#{cookbook}*",
-    "incremental" => delivery_golang_deploy_rolling(cookbook),
-    "percentage" => delivery_golang_deploy_rolling(cookbook)
+    'search' => "recipes:#{cookbook}*",
+    'incremental' => delivery_golang_deploy_rolling(cookbook),
+    'percentage' => delivery_golang_deploy_rolling(cookbook),
   }
 end
 
@@ -39,21 +39,20 @@ begin
   completed = true
 
   deploy_criteria.each do |criteria|
-    if criteria['incremental']
-      delivery_golang_deploy "deploy_#{project_name}_cookbook_#{criteria['search']}_#{criteria['percentage']}%" do
-        search criteria['search']
-        percentage criteria['percentage']
-      end
-
-      # Increment the percentage
-      criteria['percentage'] += criteria['incremental'] if criteria['percentage'] < 100
-
-      # Ensure we are not going further 100 percent
-      criteria['percentage'] = 100 if criteria['percentage'] > 100
-
-      # We have not completed
-      completed = false if criteria['percentage'] != 100
+    next unless criteria['incremental']
+    delivery_golang_deploy "deploy_#{project_name}_cookbook_#{criteria['search']}_#{criteria['percentage']}%" do
+      search criteria['search']
+      percentage criteria['percentage']
     end
+
+    # Increment the percentage
+    criteria['percentage'] += criteria['incremental'] if criteria['percentage'] < 100
+
+    # Ensure we are not going further 100 percent
+    criteria['percentage'] = 100 if criteria['percentage'] > 100
+
+    # We have not completed
+    completed = false if criteria['percentage'] != 100
   end
 
   # Deploy until we have completed

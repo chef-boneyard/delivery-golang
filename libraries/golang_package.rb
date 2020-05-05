@@ -1,10 +1,10 @@
 #
-# Cookbook Name:: delivery-golang
+# Cookbook:: delivery-golang
 # Library:: golang_package
 #
 # Author:: Salim Afiune (<afiune@chef.io>)
 #
-# Copyright 2015, Chef Software, Inc.
+# Copyright:: 2015, Chef Software, Inc.
 #
 # All rights reserved - Do Not Redistribute
 
@@ -54,7 +54,6 @@ class Chef
           opts
         end
       end
-
     end
   end
 end
@@ -62,16 +61,14 @@ end
 class Chef
   class Resource
     class GolangPackage < Chef::Resource::LWRPBase
-
       actions :get, :install, :update, :build
       default_action :get
 
-      attribute :name,  :kind_of => String, :name_attribute => true
-      attribute :cwd,   :kind_of => String
+      attribute :cwd, kind_of: String
 
       self.resource_name = :golang_package
 
-      def initialize(name, run_context=nil)
+      def initialize(name, run_context = nil)
         super
         @provider = Chef::Provider::GolangPackage
       end
