@@ -8,13 +8,9 @@
 #
 # All rights reserved - Do Not Redistribute
 
-require 'chef/mixin/shell_out'
-
 class Chef
   class Provider
     class GolangPackage < Chef::Provider::LWRPBase
-      include Chef::Mixin::ShellOut
-
       action :get do
         converge_by("Installing package #{new_resource.name}") do
           shell_out!("go get -v -d -t #{new_resource.name}", options)
