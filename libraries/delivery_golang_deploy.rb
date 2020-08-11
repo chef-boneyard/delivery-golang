@@ -71,7 +71,7 @@ class Chef
 
         ::Chef_Delivery::ClientHelper.load_delivery_user
 
-        begin
+        loop do
           # Sleep unless this is our first time through the loop.
           sleep(SLEEP_TIME) unless timeout == origin
 
@@ -126,7 +126,7 @@ class Chef
 
           ::Chef::Log.info("Started push job with id: #{job_uri[-32, 32]}")
           previous_state = 'initialized'
-          begin
+          loop do
             sleep(PUSH_SLEEP_TIME) unless previous_state == 'initialized'
             job = chef_server_rest.get_rest(job_uri)
             case job['status']
@@ -175,7 +175,8 @@ class Chef
             end
 
             dec_timeout(PUSH_SLEEP_TIME)
-          end until timeout <= 0
+            break if timeout <= 0
+          end
 
           break if finished
 
@@ -188,7 +189,8 @@ class Chef
           end
 
           dec_timeout(SLEEP_TIME)
-        end while timeout > 0
+          break unless timeout > 0
+        end
 
         ::Chef_Delivery::ClientHelper.return_to_zero
 
