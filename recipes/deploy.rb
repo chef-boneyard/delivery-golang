@@ -35,7 +35,7 @@ end
 # deploy_criteria = changed_cookbooks.map { |cookbook| "recipes:#{cookbook[:name]}*" }
 
 # Deploy incrementally
-begin
+loop do
   completed = true
 
   deploy_criteria.each do |criteria|
@@ -56,4 +56,5 @@ begin
   end
 
   # Deploy until we have completed
-end until completed
+  break if completed
+end
