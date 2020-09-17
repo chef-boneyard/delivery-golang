@@ -390,7 +390,7 @@ EOM
     # @param [Chef::Node] Chef Node object
     # @return [String]
     def repo_path(node)
-      node['delivery_builder']['repo'] || File.expand_path('../..', __FILE__)
+      node['delivery_builder']['repo'] || File.expand_path('..', __dir__)
     end
 
     def delivery_chef_config
