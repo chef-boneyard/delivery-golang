@@ -17,4 +17,3 @@ require_relative 'helpers_publish'
 # And these mix the DSL methods into the Chef infrastructure
 Chef::DSL::Recipe.include DeliveryGolang::DSL
 Chef::Resource.include DeliveryGolang::DSL
-Chef::DSL::Recipe.include DeliveryGolang::DSL
