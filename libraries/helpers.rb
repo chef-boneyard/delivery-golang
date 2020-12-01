@@ -38,15 +38,13 @@ module DeliveryGolang
       if node[CONFIG_ATTRIBUTE_KEY]
         # We don't need to do anything since the delivery_builder cookbook has
         # already loaded the attributes.
-      else
+      elsif File.exist?(config_file)
         # Check to see if the Delivery config exists in the project root. If it
         # does, then load it into the node object.
-        if File.exist?(config_file)
-          config = Chef::JSONCompat.from_json(IO.read(config_file))
-          node.force_override[CONFIG_ATTRIBUTE_KEY] = config
-        else
-          raise "MissingConfiguration #{config_file}"
-        end
+        config = Chef::JSONCompat.from_json(IO.read(config_file))
+        node.force_override[CONFIG_ATTRIBUTE_KEY] = config
+      else
+        raise "MissingConfiguration #{config_file}"
       end
       nil
     end
